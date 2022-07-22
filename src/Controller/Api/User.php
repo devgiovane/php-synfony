@@ -34,24 +34,18 @@ final class User extends AbstractController
      */
     public function create(Request $request, UserService $userService): Response
     {
-        $userDto = new UserDto();
         $notificationError = new NotificationError();
-        $response = new Response('', Response::HTTP_UNPROCESSABLE_ENTITY);
-
+        $userDto = new UserDto();
         $userDto
             ->setName($request->get('name'))
             ->setEmail($request->get('email'))
             ->setCpf($request->get('cpf', ''))
             ->setPassword($request->get('password'));
-
         $isCreated = $userService->create($notificationError, $userDto);
         if($isCreated) {
-            $response =  new Response('', Response::HTTP_CREATED);
+            return new Response('', Response::HTTP_CREATED);
         }
-        if(!$isCreated && $notificationError->hasErrors()) {
-            return new JsonResponse($notificationError->getErrors(), $notificationError->getStatusCode());
-        }
-        return $response;
+        return new JsonResponse($notificationError->getErrors(), $notificationError->getStatusCode());
     }
 
     /**
@@ -64,24 +58,16 @@ final class User extends AbstractController
      */
     public function read(Request $request, UserService $userService, OAuthService $authService): Response
     {
-        $users = null;
         $notificationError = new NotificationError();
-        $response = new Response('', Response::HTTP_UNPROCESSABLE_ENTITY);
-
         $isValidScope = $authService->validateScope($request, self::SCOPE_MANAGER_USER);
         if (!$isValidScope) {
-            $response = $authService->getResponse();
+            return $authService->getResponse();
         }
-        if ($isValidScope) {
-            $users = $userService->read($notificationError);
+        $users = $userService->read($notificationError);
+        if ($users) {
+            return new JsonResponse($users, Response::HTTP_OK);
         }
-        if ($isValidScope && $users) {
-            $response = new JsonResponse($users, Response::HTTP_OK);
-        }
-        if ($isValidScope && !$users && $notificationError->hasErrors()) {
-            $response =new JsonResponse($notificationError->getErrors(), $notificationError->getStatusCode());
-        }
-        return $response;
+        return new JsonResponse($notificationError->getErrors(), $notificationError->getStatusCode());
     }
 
     /**
@@ -96,35 +82,26 @@ final class User extends AbstractController
      */
     public function update(Request $request, UserExists $userExists, UserService $userService, OAuthService $authService, int $idUser): Response
     {
-        $isUpdated = false;
-        $userEntity = null;
         $notificationError = new NotificationError();
-        $response = new Response('', Response::HTTP_UNPROCESSABLE_ENTITY);
-
         $isValidScope = $authService->validateScope($request, self::SCOPE_MANAGER_USER);
         if (!$isValidScope) {
-            $response = $authService->getResponse();
+            return $authService->getResponse();
         }
-        if ($isValidScope) {
-            $userEntity = $userExists->findById($notificationError, $idUser);
+        $userEntity = $userExists->findById($notificationError, $idUser);
+        if (!$userEntity) {
+            return new JsonResponse($notificationError->getErrors(), $notificationError->getStatusCode());
         }
-        if ($isValidScope && $userEntity) {
-            $userDto = new UserDto();
-            $userDto
-                ->setName($request->get('name'))
-                ->setEmail($request->get('email'))
-                ->setCpf($request->get('cpf'))
-                ->setPassword(null);
-
-            $isUpdated = $userService->update($notificationError, $userEntity, $userDto);
+        $userDto = new UserDto();
+        $userDto
+            ->setName($request->get('name'))
+            ->setEmail($request->get('email'))
+            ->setCpf($request->get('cpf'))
+            ->setPassword(null);
+        $isUpdated = $userService->update($notificationError, $userEntity, $userDto);
+        if ($isUpdated) {
+            return new Response('', Response::HTTP_NO_CONTENT);
         }
-        if($isValidScope && $isUpdated) {
-           $response = new Response('', Response::HTTP_NO_CONTENT);
-        }
-        if ($isValidScope && !$isUpdated && $notificationError->hasErrors()) {
-            $response = new JsonResponse($notificationError->getErrors(), $notificationError->getStatusCode());
-        }
-        return $response;
+        return new JsonResponse($notificationError->getErrors(), $notificationError->getStatusCode());
     }
 
     /**
@@ -132,6 +109,7 @@ final class User extends AbstractController
      *
      * @param Request $request
      * @param DocumentManager $documentManager
+     * @param LogsService $logsService
      * @param UserService $userService
      * @param UserExists $userExists
      * @param OAuthService $authService
@@ -140,29 +118,21 @@ final class User extends AbstractController
      */
     public function delete(Request $request, DocumentManager $documentManager, LogsService $logsService, UserService $userService, UserExists $userExists, OAuthService $authService, int $idUser): Response
     {
-        $isDeleted = false;
-        $token = $userEntity = null;
         $notificationError = new NotificationError();
-        $response = new Response('', Response::HTTP_UNPROCESSABLE_ENTITY);
-
         $isValidScope = $authService->validateScope($request, self::SCOPE_MANAGER_USER);
         if (!$isValidScope) {
-            $response = $authService->getResponse();
+            return $authService->getResponse();
         }
-        if ($isValidScope) {
-            $token = $authService->getData($request)['token'];
-            $userEntity = $userExists->findById($notificationError, $idUser);
+        $token = $authService->getData($request)['token'];
+        $userEntity = $userExists->findById($notificationError, $idUser);
+        if (!$userEntity) {
+            return new JsonResponse($notificationError->getErrors(), $notificationError->getStatusCode());
         }
-        if ($isValidScope && $userEntity) {
-            $isDeleted = $userService->delete($notificationError, $userEntity);
-        }
-        if ($isValidScope && $isDeleted) {
+        $isDeleted = $userService->delete($notificationError, $userEntity);
+        if ($isDeleted) {
             $logsService->insert($notificationError, $documentManager, $token, "Deleted user with name {$userEntity->getName()}");
-            $response = new Response('', Response::HTTP_NO_CONTENT);
+            return new Response('', Response::HTTP_NO_CONTENT);
         }
-        if ($isValidScope && !$isDeleted && $notificationError->hasErrors()) {
-            $response = new JsonResponse($notificationError->getErrors(), $notificationError->getStatusCode());
-        }
-        return $response;
+        return new JsonResponse($notificationError->getErrors(), $notificationError->getStatusCode());
     }
 }

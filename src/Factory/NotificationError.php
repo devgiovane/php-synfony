@@ -4,6 +4,8 @@
 namespace App\Factory;
 
 
+use Symfony\Component\HttpFoundation\Response;
+
 final class NotificationError
 {
     /**
@@ -26,14 +28,14 @@ final class NotificationError
      */
     public function __construct()
     {
-        $this->statusCode = 400;
         $this->errors = array();
         $this->hasErrors = false;
+        $this->statusCode = Response::HTTP_UNPROCESSABLE_ENTITY;
     }
 
     public function reset(): NotificationError
     {
-        $this->statusCode = 400;
+        $this->statusCode = Response::HTTP_UNPROCESSABLE_ENTITY;
         $this->errors = array();
         $this->hasErrors = false;
         return $this;
