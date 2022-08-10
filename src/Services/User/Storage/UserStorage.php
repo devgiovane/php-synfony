@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 
 
-
 final class UserStorage
 {
     private const CLASS_MAPPING = 900;
@@ -123,6 +122,7 @@ final class UserStorage
             unset($exception);
             $notificationError->setError("conflict", [
                 "message" => "email_or_password_already_exists",
+                "code" => self::CLASS_MAPPING
             ]);
             $notificationError->setStatusCode(Response::HTTP_CONFLICT);
             return false;

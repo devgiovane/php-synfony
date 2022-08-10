@@ -6,6 +6,7 @@ services:
         image: php
         ports:
             - "9000:9000"
+        command: dockerize -wait tcp://database:3306 -timeout 30s ./symfony.sh
         volumes:
             - .:/var/www/code
         depends_on:

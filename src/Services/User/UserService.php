@@ -26,21 +26,23 @@ final class UserService
 
     public function create(NotificationError $notificationError, UserDto $userDto): bool
     {
-        $isCreated = $isEmailRegistered = $isCpfRegistered = false;
         $isValidUser = UserForm::validationCreate($notificationError, $userDto);
-        if($isValidUser) {
-            $isEmailRegistered = $this->userExists->findByEmail($notificationError, $userDto->getEmail());
+        if (!$isValidUser) {
+            return false;
         }
-        if($isValidUser && !$isEmailRegistered) {
-            $isCpfRegistered = $this->userExists->findByCPF($notificationError, $userDto->getCpf());
+        $isEmailRegistered = $this->userExists->findByEmail($notificationError, $userDto->getEmail());
+        if ($isEmailRegistered) {
+            return false;
         }
-        if($isValidUser && !$isEmailRegistered && !$isCpfRegistered) {
-            $isCreated = $this->userStorage->create($notificationError, $userDto);
+        $isCpfRegistered = $this->userExists->findByCPF($notificationError, $userDto->getCpf());
+        if($isCpfRegistered) {
+            return false;
         }
-        if($isCreated) {
-            return true;
+        $isCreated = $this->userStorage->create($notificationError, $userDto);
+        if(!$isCreated) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     public function read($notificationError): ?array
@@ -50,15 +52,15 @@ final class UserService
 
     public function update(NotificationError $notificationError, User $userEntity, UserDto $userDto): bool
     {
-        $isUpdated = false;
         $isValidUser = UserForm::validationUpdate($notificationError, $userDto);
-        if($isValidUser) {
-            $isUpdated = $this->userStorage->update($notificationError, $userEntity, $userDto);
+        if(!$isValidUser) {
+            return false;
         }
-        if($isUpdated) {
-            return true;
+        $isUpdated = $this->userStorage->update($notificationError, $userEntity, $userDto);
+        if(!$isUpdated) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     public function delete(NotificationError $notificationError, User $userEntity): bool

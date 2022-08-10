@@ -1,8 +1,17 @@
-# Docker Synfony
+<img src="./php.png" width="80" height="80" alt="logo">
+
+# PHP Symfony Framework
 
 ### About
 
-Docker compose for php 8 with Synfony 5, OAuth2, MySQL, Mongo, Redis
+> API Rest project developed to configure environment and implement new technologies.
+
+### Concepts:
+
+- OAuth 2.0
+- Symfony Framework
+- ORM Doctrine
+- Early return pattern
 
 ### Commands
 
@@ -10,9 +19,5 @@ Docker compose for php 8 with Synfony 5, OAuth2, MySQL, Mongo, Redis
 docker-compose up -d
 ```
 
-```bash
-docker exec -it php bash
-
-~ php bin/console make:migration
-~ php bin/console doctrine:migrations:migrate
-```
+### Create by
+© [Giovane Santos](https://giovanesantossilva.github.io/)

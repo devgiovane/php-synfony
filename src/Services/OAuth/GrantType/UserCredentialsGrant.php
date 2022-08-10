@@ -39,9 +39,9 @@ final class UserCredentialsGrant implements GrantTypeInterface
     /**
      * @param RequestInterface $request
      * @param ResponseInterface $response
-     * @return mixed
+     * @return bool|null
      */
-    public function validateRequest(RequestInterface $request, ResponseInterface $response): mixed
+    public function validateRequest(RequestInterface $request, ResponseInterface $response): ?bool
     {
         // TODO: Implement validateRequest() method.
         if (!$request->request("password") || !$request->request("username")) {

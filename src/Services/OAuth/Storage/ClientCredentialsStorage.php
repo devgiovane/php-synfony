@@ -102,7 +102,7 @@ final class ClientCredentialsStorage implements ClientCredentialsInterface
     {
         // TODO: Implement getClientDetails() method.
         /** @var LoginAppClient $clientEntity */
-        $clientEntity = $this->entityManager->getRepository(LoginAppClient::class)->findOneBy(['clientIdentifier' => $client_id, 'clientSecret' => $client_secret]);
+        $clientEntity = $this->entityManager->getRepository(LoginAppClient::class)->findOneBy(['clientIdentifier' => $client_id ]);
         if ($clientEntity) {
             return $clientEntity->jsonSerialize();
         }
