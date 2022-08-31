@@ -4,10 +4,8 @@ WORKDIR /var/www/code
 RUN rm -rf /var/www/html
 # Install Basic
 RUN apk update && apk add --no-cache \
-    wget \
     bash \
     curl \
-    make \
     libzip-dev \
     libressl-dev \
     pcre-dev $PHPIZE_DEPS
@@ -26,7 +24,5 @@ RUN pecl install redis && \
     pecl install mongodb && \
     docker-php-ext-enable mongodb
 # Install Composer
-RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
-    php composer-setup.php && \
-    php -r "unlink('composer-setup.php');" && \
-    mv composer.phar /usr/local/bin/composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+

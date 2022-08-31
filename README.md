@@ -8,6 +8,7 @@
 
 ### Concepts:
 
+- PHP 8.1
 - OAuth 2.0
 - Symfony Framework
 - ORM Doctrine

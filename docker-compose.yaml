@@ -3,7 +3,7 @@ services:
     php:
         container_name: php
         build: .
-        image: php
+        image: php:symfony
         ports:
             - "9000:9000"
         command: dockerize -wait tcp://database:3306 -timeout 30s ./symfony.sh
@@ -64,6 +64,15 @@ services:
             - ./docker/mysql:/var/lib/mysql
         networks:
             - api
+    documentation:
+        image: swaggerapi/swagger-ui
+        container_name: documentation
+        ports:
+            - "8080:8080"
+        volumes:
+            - ./swagger:/usr/share/nginx/html/swagger
+        environment:
+            API_URL: swagger/documentation.yaml
 networks:
     api:
         name: api

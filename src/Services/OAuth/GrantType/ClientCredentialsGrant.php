@@ -14,7 +14,7 @@ use OAuth2\Storage\ClientCredentialsInterface;
  */
 final class ClientCredentialsGrant extends HttpBasic implements GrantTypeInterface
 {
-    private array $clientData;
+    private $clientData;
 
     /**
      * ClientCredentialsGrant constructor.
