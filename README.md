@@ -13,6 +13,7 @@
 - Symfony Framework
 - ORM Doctrine
 - Early return pattern
+- Swagger
 
 ### Commands
 
